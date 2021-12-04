@@ -15,6 +15,13 @@ fun init() {
 class SUB {
     val go = TrackMotion()
 
+    val report: Unit
+        get() {
+            println("distance: ${Location.fwd}")
+            println("depth: ${Location.depth}")
+            println("aim: ${Location.aim}")
+        }
+    
     inner class TrackMotion {
         infix fun forward(n: Int) {
             Location.fwd += n
@@ -60,17 +67,12 @@ fun sub(fn: SUB.() -> Unit) {
     init()
     val sub = SUB()
     sub.fn()
-    println("distance: ${Location.fwd}")
-    println("depth: ${Location.depth}")
 }
 
 fun sub2(fn: SUB2.() -> Unit) {
     init()
     val sub = SUB2()
     sub.fn()
-    println("distance: ${Location.fwd}")
-    println("depth: ${Location.depth}")
-    println("aim: ${Location.aim}")
 }
 
 fun part1() {
@@ -81,27 +83,23 @@ fun part1() {
         go up 3
         go down 8
         go forward 2
+        report
     }
 }
 
 fun part2() {
     sub2 {
         go forward 5
-        report
         go down 5
-        report
         go forward 8
-        report
         go up 3
-        report
         go down 8
-        report
         go forward 2
         report
     }
 }
 
 fun main() {
-//    day2.day2.day3.part1()
+    part1()
     part2()
 }

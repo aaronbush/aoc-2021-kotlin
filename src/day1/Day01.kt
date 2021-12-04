@@ -10,6 +10,7 @@ fun main() {
     val input = readInput("Day01_test").map { it.toInt() }
     println("day2.day2.day3.part1: ${part1(input)}")
 
+    // consider window()
     val triples = input.zip(input.drop(1)).zip(input.drop(2))
     println(triples)
     val tripleSums = triples.map { l -> l.first.first + l.first.second + l.second }

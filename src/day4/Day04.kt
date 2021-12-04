@@ -15,7 +15,7 @@ fun part1(input: List<String>): Int {
 
     for (num in plays) {
         boards.forEach {
-            it.playNum(num)
+            it play num
             if (it.winner) {
                 println("BINGO on $it")
                 return it.unmarked().sum() * num
@@ -33,7 +33,7 @@ fun part2(input: List<String>): Int {
 
     for (num in plays) {
         boards.filterNot { it.winner }.forEach {
-            it.playNum(num)
+            it play num
             if (it.winner) {
                 winners += 1
                 if (boards.size == winners) {
@@ -75,7 +75,7 @@ data class Board(val cells: List<Cell>, var winner: Boolean = false) {
 
     data class Cell(val location: Pair<Int, Int>, val value: Int, var played: Boolean = false)
 
-    fun playNum(num: Int) {
+    infix fun play(num: Int) {
         cells.filter { cell -> cell.value == num }.forEach { cell -> cell.played = true }
         winner = bingo()
     }

@@ -46,7 +46,7 @@ fun part2(input: List<String>): Int {
     throw IllegalStateException("oops")
 }
 
-fun parsePlays(input: String) = input.split(",".toRegex()).map { it.trim().toInt() }
+fun parsePlays(input: String) = input.split(",").map { it.trim().toInt() }
 
 fun setupBoards(input: List<String>): List<Board> {
     val boardInput = input.filterNot { it.trim().isEmpty() }.map {

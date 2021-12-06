@@ -3,39 +3,34 @@ package day5
 import readInput
 
 fun main() {
-    val input = readInput("Day05")
-    println(part1(input))
-    println(part2(input))
+    val segments = readInput("Day05").asSegments()
+    println(part1(segments))
+    println(part2(segments))
 }
 
-fun part1(input: List<String>): Int {
-    // filter for horizontal and vertical lines
-    val segments = input.mapNotNull { line ->
-        "(\\d+),(\\d+)\\s->\\s(\\d+),(\\d+)".toRegex().matchEntire(line)?.destructured?.let { (s_x, s_y, e_x, e_y) ->
-            if (s_x == e_x || s_y == e_y) {
-                LineSegment(s_x.toInt() to s_y.toInt(), e_x.toInt() to e_y.toInt())
-            } else null
-        }
-    }
-
-    val intersections = intersectionPoints(segments)
-//    println(intersections)
-    return intersections.size
-}
-
-fun part2(input: List<String>): Int {
-    val segments = input.mapNotNull { line ->
+fun List<String>.asSegments(): List<LineSegment> {
+    return this.mapNotNull { line ->
         "(\\d+),(\\d+)\\s->\\s(\\d+),(\\d+)".toRegex().matchEntire(line)?.destructured?.let { (s_x, s_y, e_x, e_y) ->
             LineSegment(s_x.toInt() to s_y.toInt(), e_x.toInt() to e_y.toInt())
         }
     }
-    val intersections = intersectionPoints(segments)
+}
+
+fun part1(segments: List<LineSegment>): Int {
+    val h_v_segments = segments.filter { it.slope.numerator == 0 || it.slope.denominator == 0 }
+    val intersections = h_v_segments.intersectionPoints()
 //    println(intersections)
     return intersections.size
 }
 
-fun intersectionPoints(segments: List<LineSegment>): Map<Pair<Int, Int>, List<Pair<Int, Int>>> {
-    val allPoints = segments.flatMap { line -> line.points() }
+fun part2(segments: List<LineSegment>): Int {
+    val intersections = segments.intersectionPoints()
+//    println(intersections)
+    return intersections.size
+}
+
+fun List<LineSegment>.intersectionPoints(): Map<Point, List<Point>> {
+    val allPoints = flatMap { line -> line.points() }
     return allPoints.groupBy { it }.filter { (_, v) -> v.size > 1 }
 }
 
@@ -57,27 +52,34 @@ data class Fraction(val numerator: Int, val denominator: Int) {
     }
 }
 
-data class LineSegment(val start: Pair<Int, Int>, val end: Pair<Int, Int>) {
-    val slope = if (start.second == end.second) { // horizontal line; dx = 1, dy = 0
+data class LineSegment(val start: Point, val end: Point) {
+    val slope = if (start.y == end.y) { // horizontal line; dx = 1, dy = 0
         Fraction(1, 0)
-    } else if (start.first == end.first) { // vertical line; dx = 0, dy = 1
+    } else if (start.x == end.x) { // vertical line; dx = 0, dy = 1
         Fraction(0, 1)
     } else { // diagonal
-        Fraction.of(start.first - end.first, start.second - end.second)
+        Fraction.of(start.x - end.x, start.y - end.y)
     }
 
     // list of points along line segment; inclusive of each end
-    fun points(): List<Pair<Int, Int>> =
+    fun points(): List<Point> =
         if (slope.denominator == 0) { // horizontal
-            (start.first toward end.first by slope.numerator).map { it to start.second }
+            (start.x toward end.x by slope.numerator).map { it to start.y }
         } else if (slope.numerator == 0) { // vertical
-            (start.second toward end.second by slope.denominator).map { start.first to it }
+            (start.y toward end.y by slope.denominator).map { start.x to it }
         } else { // diagonal
-            val xs = start.first toward end.first by slope.numerator
-            val ys = start.second toward end.second by slope.denominator
+            val xs = start.x toward end.x by slope.numerator
+            val ys = start.y toward end.y by slope.denominator
             xs.zip(ys)
         }
 }
+
+typealias Point = Pair<Int, Int>
+
+val Pair<Int, Int>.x
+    get() = this.first
+val Pair<Int, Int>.y
+    get() = this.second
 
 infix fun Int.toward(end: Int): MyProgression {
     return MyProgression(this, end)
@@ -86,6 +88,6 @@ infix fun Int.toward(end: Int): MyProgression {
 data class MyProgression(val start: Int, val end: Int) {
     infix fun by(step: Int): IntProgression {
         val resolved_step = if (end > start) kotlin.math.abs(step) else -1 * kotlin.math.abs(step)
-        return IntProgression.fromClosedRange(start, end, if (resolved_step == 0) 1 else resolved_step)
+        return IntProgression.fromClosedRange(start, end, resolved_step)
     }
 }

@@ -1,7 +1,6 @@
 package day9
 
 import readInput
-import java.util.function.Predicate
 
 fun main() {
     val input = readInput("Day09")
@@ -35,10 +34,10 @@ data class Grid(val points: List<Point>) {
     private val directions = listOf(Point::north, Point::south, Point::east, Point::west)
     private val pointMap = points.associateBy { p -> (p.row to p.column) }
 
-    fun surroundingFilter(point: Point, p: Predicate<Point>): Set<Point> {
+    fun surroundingFilter(point: Point, p: (Point) -> Boolean): Set<Point> {
         val result = mutableSetOf<Point>()
         fun loop(nextPoint: Point, accum: MutableSet<Point>): Set<Point> {
-            if (p.test(nextPoint) && accum.add(nextPoint)) {
+            if (p(nextPoint) && accum.add(nextPoint)) {
                 nextPoint.adjacentPoints().forEach { loop(it, accum) }
             }
             return accum
@@ -46,12 +45,8 @@ data class Grid(val points: List<Point>) {
         return loop(point, result)
     }
 
-    fun <R> mapAdjacent(fn: (currentPoint: Point, adjacentPoints: List<Point>) -> R): List<R> {
-        return pointMap.map { (k, v) ->
-            val aps = v.adjacentPoints()
-            fn(v, aps)
-        }
-    }
+    fun <R> mapAdjacent(fn: (currentPoint: Point, adjacentPoints: List<Point>) -> R) =
+        pointMap.map { (_, v) -> fn(v, v.adjacentPoints()) }
 
     private fun Point.adjacentPoints(): List<Point> {
         val adjacent = directions.map { fn -> this.let(fn) }

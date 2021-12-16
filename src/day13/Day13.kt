@@ -26,7 +26,6 @@ fun main() {
         )
     )
     grid.print()
-
 }
 
 fun part1(grid: Grid, folds: List<FoldAbout>): Int {
@@ -66,7 +65,6 @@ data class Grid(val points: MutableMap<Location, String>) {
         belowTheFold.forEach { (location, dot) -> points[location] = dot }
 
         // remove old points that were folded
-
         points.filter { (l, _) -> l.y > fold.y_fold }.forEach { (k, _) -> points.remove(k) }
     }
 
@@ -78,7 +76,6 @@ data class Grid(val points: MutableMap<Location, String>) {
         belowTheFold.forEach { (location, dot) -> points[location] = dot }
 
         // remove old points that were folded
-
         points.filter { (l, _) -> l.x > fold.x_fold }.forEach { (k, _) -> points.remove(k) }
     }
 
